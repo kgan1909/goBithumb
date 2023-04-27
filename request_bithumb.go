@@ -122,7 +122,10 @@ func (b *BithumbRequester) GetMarkets() ([]Currency, error) {
 }
 
 func (b *BithumbRequester) GetTradableCoinList() []Currency {
-	requestResult := b.requester.requestPublic(b.ticker, "all_krw")
+	requestResult, err := b.requester.requestPublic(b.ticker, "all_krw")
+	if err != nil {
+		return nil
+	}
 	var tempResult map[string]interface{}
 	var stringResult []string
 	var result []Currency
@@ -255,7 +258,10 @@ func (b *BithumbRequester) GetBTCI() (BTCI, time.Time, error) {
 
 func (b *BithumbRequester) GetCandleStick(orderCurreny Currency, paymentCurrency Currency, chartInterval TimeInterval) ([]OneCandleStick, error) {
 	body := string(orderCurreny) + "_" + string(paymentCurrency) + "/" + string(chartInterval)
-	requestResult := b.requester.requestPublic(b.candlestick, body)
+	requestResult, err := b.requester.requestPublic(b.candlestick, body)
+	if err != nil {
+		return nil, err
+	}
 	var rawResult RawCandleStick
 	_ = json.Unmarshal(requestResult, &rawResult)
 
