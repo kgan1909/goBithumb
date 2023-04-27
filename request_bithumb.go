@@ -84,6 +84,38 @@ func (b *BithumbRequester) publicRequest(reqUrl publicOrder, reqBody string) map
 	return result
 }
 
+func (b *BithumbRequester) GetMarkets() ([]Currency, error) {
+	requestResult, err := b.requester.requestPublic(b.ticker, "all_krw")
+	if err != nil {
+		return nil, err
+	}
+	requestResult_btc, err := b.requester.requestPublic(b.ticker, "all_btc")
+	if err != nil {
+		return nil, err
+	}
+
+	var tempResult map[string]interface{}
+	var tempResult_btc map[string]interface{}
+	var stringResult []string
+	var result []Currency
+	json.Unmarshal(requestResult, &tempResult)
+	json.Unmarshal(requestResult_btc, &tempResult_btc)
+	datas := tempResult["data"].(map[string]interface{})
+	datas_btc := tempResult_btc["data"].(map[string]interface{})
+
+	for index := range datas {
+		stringResult = append(stringResult, index+"/"+"KRW")
+	}
+	for index := range datas_btc {
+		stringResult = append(stringResult, index+"/"+"BTC")
+	}
+	sort.Strings(stringResult)
+	for _, data := range stringResult {
+		result = append(result, Currency(strings.ToUpper(data)))
+	}
+	return result[:len(result)-2], nil // 마지막 하나가 date이므로, date를 제외하고 전달함
+}
+
 func (b *BithumbRequester) GetTradableCoinList() []Currency {
 	requestResult := b.requester.requestPublic(b.ticker, "all_krw")
 	var tempResult map[string]interface{}

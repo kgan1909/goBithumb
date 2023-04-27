@@ -38,23 +38,23 @@ func newHttpRequester(connectKey string, secretKey string) *httpRequester {
 	return &httpRequester
 }
 
-func (h *httpRequester) requestPublic(order publicOrder, data string) []byte {
+func (h *httpRequester) requestPublic(order publicOrder, data string) ([]byte, error) {
 
 	request, err := http.NewRequest("GET", h.basicUrl+string(order)+"/"+data, nil)
 	if err != nil {
-		panic("Failed to create Request")
+		return nil, err
 	}
 
 	response, err := h.publicClient.Do(request)
 	if err != nil {
-		panic("Failed to receive Data, check server status")
+		return nil, err
 	}
 
 	byteResponse, err := ioutil.ReadAll(response.Body)
 	if err != nil {
-		timelog("Failed to receive Data")
+		return nil, err
 	}
-	return byteResponse
+	return byteResponse, nil
 }
 
 func (h *httpRequester) requestPrivate(passVal map[string]string) []byte {
