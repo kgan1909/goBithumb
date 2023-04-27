@@ -78,10 +78,15 @@ func NewBithumb(connectKey string, secretKey string) *BithumbRequester {
 }
 
 func (b *BithumbRequester) publicRequest(reqUrl publicOrder, reqBody string) map[string]interface{} {
-	requestResult := b.requester.requestPublic(reqUrl, reqBody)
-	var result map[string]interface{}
-	_ = json.Unmarshal(requestResult, &result)
-	return result
+	requestResult, err := b.requester.requestPublic(reqUrl, reqBody)
+	if err != nil {
+		fmt.Println(err)
+	} else {
+		var result map[string]interface{}
+		_ = json.Unmarshal(requestResult, &result)
+		return result
+	}
+	return nil
 }
 
 func (b *BithumbRequester) GetMarkets() ([]Currency, error) {
